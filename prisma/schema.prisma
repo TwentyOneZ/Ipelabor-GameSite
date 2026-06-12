@@ -1,0 +1,57 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id               Int          @id @default(autoincrement())
+  email            String       @unique
+  password         String
+  name             String
+  role             String       @default("CONTADOR") // "ADMIN", "CONTADOR"
+  phone            String?
+  cpfCnpj          String?
+  companyName      String?
+  avatarUrl        String?
+  status           String       @default("ACTIVE") // "ACTIVE", "INACTIVE"
+  resetToken       String?
+  resetTokenExpiry DateTime?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  
+  sales            Sale[]       @relation("AccountantSales")
+  commissions      Commission[] @relation("AccountantCommissions")
+}
+
+model Sale {
+  id           Int          @id @default(autoincrement())
+  accountantId Int
+  clientName   String
+  clientCnpj   String?
+  serviceType  String       // e.g. "PGR/LTCAT", "NR-01", "Plano de Ação", "PCMSO", "ASO"
+  saleDate     DateTime     @default(now())
+  value        Float
+  livesCount   Int          @default(0) // Used for NR-01 life-based commission
+  isRenewal    Boolean      @default(false)
+  createdAt    DateTime     @default(now())
+  
+  accountant   User         @relation("AccountantSales", fields: [accountantId], references: [id], onDelete: Cascade)
+  commissions  Commission[] @relation("SaleCommissions")
+}
+
+model Commission {
+  id           Int              @id @default(autoincrement())
+  accountantId Int
+  saleId       Int
+  value        Float
+  status       String           @default("PENDING") // "PENDING", "PAID"
+  paidAt       DateTime?
+  createdAt    DateTime         @default(now())
+  
+  accountant   User             @relation("AccountantCommissions", fields: [accountantId], references: [id], onDelete: Cascade)
+  sale         Sale             @relation("SaleCommissions", fields: [saleId], references: [id], onDelete: Cascade)
+}

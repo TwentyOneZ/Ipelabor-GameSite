@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ipelabor-portal-contador
+    restart: unless-stopped
+    ports:
+      - "7002:7002"
+    volumes:
+      - ./prisma:/app/prisma
+    environment:
+      - NODE_ENV=production
+      - PORT=7002
+      - DATABASE_URL=file:./dev.db
+      - JWT_SECRET=ipelabor_secret_key_12345_super_secure_nextjs_custom_jwt
+
+  ssh_tunnel:
+    build:
+      context: .
+      dockerfile: dockerfile.ssh
+    container_name: ssh_tunnel_portal_contador
+    restart: unless-stopped
+    volumes:
+      - ${SSH_PRIVATE_KEY_PATH:-./ipelabor.key}:/run/ssh-keys/ipelabor.key:ro
+    environment:
+      SSH_REMOTE_USER: ${SSH_REMOTE_USER}
+      SSH_REMOTE_HOST: ${SSH_REMOTE_HOST}
+      SSH_REMOTE_PORT: ${SSH_REMOTE_PORT:-22}
+      SSH_TUNNEL_REMOTE_PORT: ${SSH_TUNNEL_REMOTE_PORT:-7004}
+      SSH_TUNNEL_TARGET_HOST: ${SSH_TUNNEL_TARGET_HOST:-web}
+      SSH_TUNNEL_TARGET_PORT: ${SSH_TUNNEL_TARGET_PORT:-7002}
+    depends_on:
+      web:
+        condition: service_started
