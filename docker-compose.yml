@@ -8,12 +8,12 @@ services:
     container_name: ipelabor-portal-contador
     restart: unless-stopped
     ports:
-      - "7002:7002"
+      - "7004:7004"
     volumes:
       - ./prisma:/app/prisma
     environment:
       - NODE_ENV=production
-      - PORT=7002
+      - PORT=7004
       - DATABASE_URL=file:./dev.db
       - JWT_SECRET=ipelabor_secret_key_12345_super_secure_nextjs_custom_jwt
 
@@ -31,7 +31,7 @@ services:
       SSH_REMOTE_PORT: ${SSH_REMOTE_PORT:-22}
       SSH_TUNNEL_REMOTE_PORT: ${SSH_TUNNEL_REMOTE_PORT:-7004}
       SSH_TUNNEL_TARGET_HOST: ${SSH_TUNNEL_TARGET_HOST:-web}
-      SSH_TUNNEL_TARGET_PORT: ${SSH_TUNNEL_TARGET_PORT:-7002}
+      SSH_TUNNEL_TARGET_PORT: ${SSH_TUNNEL_TARGET_PORT:-7004}
     depends_on:
       web:
         condition: service_started

@@ -36,7 +36,7 @@ export async function POST(request) {
     });
 
     // Mock sending email in console
-    const resetUrl = `http://localhost:7002/reset-password?token=${resetToken}`;
+    const resetUrl = `http://localhost:7004/reset-password?token=${resetToken}`;
     console.log('\n=================== MOCK EMAIL SENT ===================');
     console.log(`To: ${user.email}`);
     console.log(`Subject: Redefinição de Senha - Portal do Contador Ipê Labor`);

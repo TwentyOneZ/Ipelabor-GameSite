@@ -17,6 +17,8 @@ RUN npm ci
 FROM node:18-alpine AS builder
 WORKDIR /app
 
+RUN apk add --no-cache libc6-compat
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
@@ -33,7 +35,7 @@ WORKDIR /app
 RUN apk add --no-cache libc6-compat openssl
 
 ENV NODE_ENV production
-ENV PORT 7002
+ENV PORT 7004
 ENV NEXT_TELEMETRY_DISABLED 1
 
 # Copy necessary files
@@ -44,7 +46,7 @@ COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/.env ./.env
 
-EXPOSE 7002
+EXPOSE 7004
 
 # Startup command to push schema, seed db if empty, and start Next.js
 CMD npx prisma db push && node prisma/seed.js && npm run start
